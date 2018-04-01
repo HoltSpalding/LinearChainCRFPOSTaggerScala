@@ -120,6 +120,7 @@ def weightedfeatures(y: Array[label], x: Array[token], theta:DenseVector[Double]
    	//TODO we need this to be 1 when single sentence, 0 when long sentences
    //	println("weightedfeatures")
    //	println(x(0))
+   //TODO this really shud be 1 page 288
     var features = for(i <- 1 until k) yield {
         exp(theta(0)*f1(y(i),y(i-1),x,i) + theta(1)*f2(y(i),y(i-1),x,i)
         + theta(2)*f3(y(i),y(i-1),x,i) + theta(3)*f4(y(i),y(i-1),x,i)
@@ -129,7 +130,9 @@ def weightedfeatures(y: Array[label], x: Array[token], theta:DenseVector[Double]
     }
     //edwin chen says to add them lol 
   //  println("pos ion")
-    features.reduceLeft(_*_)
+    var toreturn = features.reduceLeft(_*_)
+    //println("WEIGHTEDFEAT" + toreturn)
+    return toreturn
 }
 
 def normalize(x: Array[token], theta: DenseVector[Double]):Double = {
@@ -141,8 +144,12 @@ def normalize(x: Array[token], theta: DenseVector[Double]):Double = {
 }
 
 def probability(y: Array[label], x: Array[token], theta: DenseVector[Double]):Double = {
-    weightedfeatures(y,x,theta)/normalize(x,theta)
+    var toreturn = weightedfeatures(y,x,theta)/normalize(x,theta)
+   // println("PRO" + toreturn)
+    return toreturn
 }
+
+
 
 
 //Feature Engineering
@@ -154,7 +161,7 @@ def neglog_likelihood(theta: DenseVector[Double]): Double = {
 		//println(j + ": j")
 		//println(currpos + ": currpos")
 		//println("array: " +   buf(currpos)._1 + buf(currpos + 1)._1 + buf(currpos + 2)._1 + buf(currpos + 3)._1 + buf(currpos + 4)._1)
-	    (theta(0)*f1(buf(currpos + j)._2,buf(currpos + (j-1))._2,Array[String](buf(currpos)._1,
+	    theta(0)*f1(buf(currpos + j)._2,buf(currpos + (j-1))._2,Array[String](buf(currpos)._1,
 	                                                      buf(currpos + 1)._1,
 	                                                      buf(currpos + 2)._1,
 	                                                      buf(currpos + 3)._1,
@@ -188,22 +195,35 @@ def neglog_likelihood(theta: DenseVector[Double]): Double = {
 	                                                      buf(currpos + 1)._1,
 	                                                      buf(currpos + 2)._1,
 	                                                      buf(currpos + 3)._1,
-	                                                      buf(currpos + 4)._1), j),
-	    normalize(Array[String](buf(currpos)._1,
+	                                                      buf(currpos + 4)._1), j)    
+
+ 	}
+ 	var Z = normalize(Array[String](buf(currpos)._1,
 	                            buf(currpos + 1)._1,
 	                            buf(currpos + 2)._1,
 	                            buf(currpos + 3)._1,
-	                            buf(currpos + 4)._1),theta))    
-
- 	}
+	                            buf(currpos + 4)._1),theta)
  	/*var regpenalty = 0.0
     for(t <- 0 until m) {
         regpenalty += theta(t)*theta(t)/20
     }  - regpenalty*/ 
-    return -1.0 * (features.map(_._1).sum - log(features.map(_._2).sum))
+    return -1.0 * (features.reduceLeft(_+_) - log(Z))
 } 
 
-
+def marg(y: String, yprime: String, theta: DenseVector[Double]): Double = {
+//proba yprimt occurs in theata at each place * probability of label is in the distributions?
+val templist : List[label] = List(y, yprime)
+var result = for(y1<-templist;y2<-templist;y3<-templist;y4<-templist;y5<-templist) yield {
+				probability(Array[String](y1,y2,y3,y4,y5),Array[String](buf(currpos)._1,
+		                                       buf(currpos + 1)._1,
+		                                       buf(currpos + 2)._1,
+		                                       buf(currpos + 3)._1,
+		                                       buf(currpos + 4)._1),theta)
+			}
+var toreturn = result.reduceLeft(_+_)
+println("marg" + toreturn)
+return toreturn
+}
 
 def log_likelihood_gradient(theta: DenseVector[Double]):DenseVector[Double] =  {
     println("gradient")
@@ -247,82 +267,64 @@ def log_likelihood_gradient(theta: DenseVector[Double]):DenseVector[Double] =  {
 	                                                     	buf(currpos + 3)._1,
 	                                                     	buf(currpos + 4)._1), j))
 	}
-	var second: ListBuffer[(Double,Double,Double,Double,Double,Double, Double)]  = ListBuffer()
-	for(y1<-labels;y2<-labels;y3<-labels;y4<-labels;y5<-labels) {
-    var tmp = Array[String](y1,y2,y3,y4,y5)
-    var feat = for(j <- 1 until k) yield {
-		(f1(tmp(j),tmp(j-1),Array[String](buf(currpos)._1,
+
+	var second: ListBuffer[(Double,Double,Double,Double,Double,Double,Double)]  = ListBuffer()
+	for(j <- 0 until k) {
+		var feat = for(y1<-labels;y2<-labels) yield {
+			(f1(y1,y2,Array[String](buf(currpos)._1,
 		                                       buf(currpos + 1)._1,
 		                                       buf(currpos + 2)._1,
 		                                       buf(currpos + 3)._1,
-		                                       buf(currpos + 4)._1), j),
-		f2(tmp(j),tmp(j-1),Array[String](buf(currpos)._1,
+		                                       buf(currpos + 4)._1), j)*marg(y1,y2,theta),
+																					
+			f2(y1,y2,Array[String](buf(currpos)._1,
 		                                       buf(currpos + 1)._1,
 		                                       buf(currpos + 2)._1,
 		                                       buf(currpos + 3)._1,
-		                                       buf(currpos + 4)._1), j),
-		f3(tmp(j),tmp(j-1),Array[String](buf(currpos)._1,
+		                                       buf(currpos + 4)._1), j)*marg(y1,y2,theta),
+			f3(y1,y2,Array[String](buf(currpos)._1,
 		                                       buf(currpos + 1)._1,
 		                                       buf(currpos + 2)._1,
 		                                       buf(currpos + 3)._1,
-		                                       buf(currpos + 4)._1), j),
-		f4(tmp(j),tmp(j-1),Array[String](buf(currpos)._1,
+		                                       buf(currpos + 4)._1), j)*marg(y1,y2,theta),
+			f4(y1,y2,Array[String](buf(currpos)._1,
 		                                       buf(currpos + 1)._1,
 		                                       buf(currpos + 2)._1,
 		                                       buf(currpos + 3)._1,
-		                                       buf(currpos + 4)._1), j),
-		f5(tmp(j),tmp(j-1),Array[String](buf(currpos)._1,
+		                                       buf(currpos + 4)._1), j)*marg(y1,y2,theta),
+			f5(y1,y2,Array[String](buf(currpos)._1,
 		                                       buf(currpos + 1)._1,
 		                                       buf(currpos + 2)._1,
 		                                       buf(currpos + 3)._1,
-		                                       buf(currpos + 4)._1), j),
-		f6(tmp(j),tmp(j-1),Array[String](buf(currpos)._1,
+		                                       buf(currpos + 4)._1), j)*marg(y1,y2,theta),
+			f6(y1,y2,Array[String](buf(currpos)._1,
 		                                       buf(currpos + 1)._1,
 		                                       buf(currpos + 2)._1,
 		                                       buf(currpos + 3)._1,
-		                                       buf(currpos + 4)._1), j),
-		f7(tmp(j),tmp(j-1),Array[String](buf(currpos)._1,
+		                                       buf(currpos + 4)._1), j)*marg(y1,y2,theta),
+			f7(y1,y2,Array[String](buf(currpos)._1,
 		                                       buf(currpos + 1)._1,
 		                                       buf(currpos + 2)._1,
 		                                       buf(currpos + 3)._1,
-		                                       buf(currpos + 4)._1), j))
-   	}
-   	second += ((feat.map(_._1).sum*(probability(tmp, Array[String](buf(currpos)._1,
-	                                       buf(currpos + 1)._1,
-	                                       buf(currpos + 2)._1,
-	                                       buf(currpos + 3)._1,
-	                                       buf(currpos + 4)._1),theta)),
-   				feat.map(_._2).sum*(probability(tmp, Array[String](buf(currpos)._1,
-	                                       buf(currpos + 1)._1,
-	                                       buf(currpos + 2)._1,
-	                                       buf(currpos + 3)._1,
-	                                       buf(currpos + 4)._1),theta)),
-   				feat.map(_._3).sum*(probability(tmp, Array[String](buf(currpos)._1,
-	                                       buf(currpos + 1)._1,
-	                                       buf(currpos + 2)._1,
-	                                       buf(currpos + 3)._1,
-	                                       buf(currpos + 4)._1),theta)),
-   				feat.map(_._4).sum*(probability(tmp, Array[String](buf(currpos)._1,
-	                                       buf(currpos + 1)._1,
-	                                       buf(currpos + 2)._1,
-	                                       buf(currpos + 3)._1,
-	                                       buf(currpos + 4)._1),theta)),
-   				feat.map(_._5).sum*(probability(tmp, Array[String](buf(currpos)._1,
-	                                       buf(currpos + 1)._1,
-	                                       buf(currpos + 2)._1,
-	                                       buf(currpos + 3)._1,
-	                                       buf(currpos + 4)._1),theta)),
-   				feat.map(_._6).sum*(probability(tmp, Array[String](buf(currpos)._1,
-	                                       buf(currpos + 1)._1,
-	                                       buf(currpos + 2)._1,
-	                                       buf(currpos + 3)._1,
-	                                       buf(currpos + 4)._1),theta)),
-   				feat.map(_._7).sum*(probability(tmp, Array[String](buf(currpos)._1,
-	                                       buf(currpos + 1)._1,
-	                                       buf(currpos + 2)._1,
-	                                       buf(currpos + 3)._1,
-	                                       buf(currpos + 4)._1),theta))))
-	}	                           		   
+		                                       buf(currpos + 4)._1), j)*marg(y1,y2,theta))
+		}
+		println("HERE!" + (feat.map(_._1).sum,
+					feat.map(_._2).sum,
+					feat.map(_._3).sum,
+					feat.map(_._4).sum,
+					feat.map(_._5).sum,
+					feat.map(_._6).sum,
+					feat.map(_._7).sum))
+		second += ((feat.map(_._1).sum,
+					feat.map(_._2).sum,
+					feat.map(_._3).sum,
+					feat.map(_._4).sum,
+					feat.map(_._5).sum,
+					feat.map(_._6).sum,
+					feat.map(_._7).sum))
+
+	}
+	   		   
     currpos += 1 
     var toreturn = DenseVector[Double](first.map(_._1).sum - second.map(_._1).sum, first.map(_._2).sum - second.map(_._2).sum,
 									   first.map(_._3).sum - second.map(_._3).sum, first.map(_._4).sum - second.map(_._4).sum,																			
@@ -331,7 +333,7 @@ def log_likelihood_gradient(theta: DenseVector[Double]):DenseVector[Double] =  {
     println("currpos" + currpos)
     println("new theta " + toreturn)
     second.clear()
-    return toreturn
+    return toreturn:*=(-1.0)
 }
 
 

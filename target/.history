@@ -158,3 +158,44 @@ compile
 run
 compile
 run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+var s = (4,5,3)
+var s = List(4,5,3)
+var s:List[Double] = List(4,5,3)
+compile)
+compile
+compiel
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
