@@ -1,0 +1,5 @@
+console
+tmp = true
+val tmp:Boolean = true
+var tmp = true
+console

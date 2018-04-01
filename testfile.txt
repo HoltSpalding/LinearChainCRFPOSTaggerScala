@@ -1,0 +1,6 @@
+fighting VERB
+dive OTHER
+dog NOUN
+? OTHER
+
+. OTHER

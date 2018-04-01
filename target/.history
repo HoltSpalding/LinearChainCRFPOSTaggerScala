@@ -1,0 +1,73 @@
+~compile
+run
+~compile
+run
+compile
+~compile
+compile
+~compile
+compile
+~compile
+compile
+var sa = ListBuffer(1,2)
+type g = (String,INT)
+type g = [String,Int]
+type g = (String,Int)
+val buf : ListBuffer[(String,String)] = ListBuffer()
+import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.ListBuffer._
+~compile
+compile
+~compile
+compile
+run
+compile
+run
+compile
+run
+compile
+clear
+clr
+cls
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
+compile
+run
