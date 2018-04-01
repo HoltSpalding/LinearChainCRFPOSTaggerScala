@@ -64,7 +64,54 @@ def f2(yi: label, yimin1: label, tokens: Array[token], i: Int): Double = {
         else {
             return 0.0
         }
-    }
+ }
+
+ def f3(yi: label, yimin1: label, tokens: Array[token], i: Int): Double = {
+    //println("f3")
+    if (i == 0) {return 0.0}
+	else if (((tokens(i-1) == "the") || (tokens(i-1) == "a"))&& yi == "NOUN") {
+            return 1.0
+        }
+        else {
+            return 0.0
+        }
+ }
+ def f4(yi: label, yimin1: label, tokens: Array[token], i: Int): Double = {
+  //  println("f4")
+	if (tokens(i).endsWith("ive") && yi == "OTHER") {
+            return 1.0
+        }
+        else {
+            return 0.0
+        }
+ }
+ def f5(yi: label, yimin1: label, tokens: Array[token], i: Int): Double = {
+  //  println("f5")
+	if (yimin1 == "OTHER" && yi == "NOUN") {
+            return 1.0
+        }
+        else {
+            return 0.0
+        }
+ }
+ def f6(yi: label, yimin1: label, tokens: Array[token], i: Int): Double = {
+  //  println("f6")
+	if (yimin1 == "VERB" && ((yi == "NOUN") || (yi == "OTHER"))) {
+            return 1.0
+        }
+        else {
+            return 0.0
+        }
+ }
+ def f7(yi: label, yimin1: label, tokens: Array[token], i: Int): Double = {
+  //  println("f7")
+	if ((tokens(i) == ".") || (tokens(i) == ",") && yi == "OTHER") {
+            return 1.0
+        }
+        else {
+            return 0.0
+        }
+ }
 
 
 
@@ -74,7 +121,11 @@ def weightedfeatures(y: Array[label], x: Array[token], theta:DenseVector[Double]
    //	println("weightedfeatures")
    //	println(x(0))
     var features = for(i <- 1 until k) yield {
-        exp(theta(0)*f1(y(i),y(i-1),x,i) + theta(1)*f2(y(i),y(i-1),x,i))
+        exp(theta(0)*f1(y(i),y(i-1),x,i) + theta(1)*f2(y(i),y(i-1),x,i)
+        + theta(2)*f3(y(i),y(i-1),x,i) + theta(3)*f4(y(i),y(i-1),x,i)
+        + theta(4)*f5(y(i),y(i-1),x,i) + theta(5)*f6(y(i),y(i-1),x,i)
+        + theta(6)*f7(y(i),y(i-1),x,i)
+    	)
     }
     //edwin chen says to add them lol 
   //  println("pos ion")
@@ -112,6 +163,31 @@ def neglog_likelihood(theta: DenseVector[Double]): Double = {
 	                                                      buf(currpos + 1)._1,
 	                                                      buf(currpos + 2)._1,
 	                                                      buf(currpos + 3)._1,
+	                                                      buf(currpos + 4)._1), j) +
+	    theta(2)*f3(buf(currpos + j)._2,buf(currpos + (j-1))._2,Array[String](buf(currpos)._1,
+	                                                      buf(currpos + 1)._1,
+	                                                      buf(currpos + 2)._1,
+	                                                      buf(currpos + 3)._1,
+	                                                      buf(currpos + 4)._1), j) +
+	    theta(3)*f4(buf(currpos + j)._2,buf(currpos + (j-1))._2,Array[String](buf(currpos)._1,
+	                                                      buf(currpos + 1)._1,
+	                                                      buf(currpos + 2)._1,
+	                                                      buf(currpos + 3)._1,
+	                                                      buf(currpos + 4)._1), j) +
+	    theta(4)*f5(buf(currpos + j)._2,buf(currpos + (j-1))._2,Array[String](buf(currpos)._1,
+	                                                      buf(currpos + 1)._1,
+	                                                      buf(currpos + 2)._1,
+	                                                      buf(currpos + 3)._1,
+	                                                      buf(currpos + 4)._1), j) +
+	    theta(5)*f6(buf(currpos + j)._2,buf(currpos + (j-1))._2,Array[String](buf(currpos)._1,
+	                                                      buf(currpos + 1)._1,
+	                                                      buf(currpos + 2)._1,
+	                                                      buf(currpos + 3)._1,
+	                                                      buf(currpos + 4)._1), j) +
+	    theta(6)*f7(buf(currpos + j)._2,buf(currpos + (j-1))._2,Array[String](buf(currpos)._1,
+	                                                      buf(currpos + 1)._1,
+	                                                      buf(currpos + 2)._1,
+	                                                      buf(currpos + 3)._1,
 	                                                      buf(currpos + 4)._1), j),
 	    normalize(Array[String](buf(currpos)._1,
 	                            buf(currpos + 1)._1,
@@ -144,9 +220,34 @@ def log_likelihood_gradient(theta: DenseVector[Double]):DenseVector[Double] =  {
 	                                                     	buf(currpos + 1)._1,
 	                                                     	buf(currpos + 2)._1,
 	                                                     	buf(currpos + 3)._1,
+	                                                     	buf(currpos + 4)._1), j),
+	   	f3(buf(currpos + j)._2,buf(currpos + (j-1))._2,Array[String](buf(currpos)._1,
+	                                                     	buf(currpos + 1)._1,
+	                                                     	buf(currpos + 2)._1,
+	                                                     	buf(currpos + 3)._1,
+	                                                     	buf(currpos + 4)._1), j),
+	   	f4(buf(currpos + j)._2,buf(currpos + (j-1))._2,Array[String](buf(currpos)._1,
+	                                                     	buf(currpos + 1)._1,
+	                                                     	buf(currpos + 2)._1,
+	                                                     	buf(currpos + 3)._1,
+	                                                     	buf(currpos + 4)._1), j),
+	   	f5(buf(currpos + j)._2,buf(currpos + (j-1))._2,Array[String](buf(currpos)._1,
+	                                                     	buf(currpos + 1)._1,
+	                                                     	buf(currpos + 2)._1,
+	                                                     	buf(currpos + 3)._1,
+	                                                     	buf(currpos + 4)._1), j),
+	   	f6(buf(currpos + j)._2,buf(currpos + (j-1))._2,Array[String](buf(currpos)._1,
+	                                                     	buf(currpos + 1)._1,
+	                                                     	buf(currpos + 2)._1,
+	                                                     	buf(currpos + 3)._1,
+	                                                     	buf(currpos + 4)._1), j),
+	   	f7(buf(currpos + j)._2,buf(currpos + (j-1))._2,Array[String](buf(currpos)._1,
+	                                                     	buf(currpos + 1)._1,
+	                                                     	buf(currpos + 2)._1,
+	                                                     	buf(currpos + 3)._1,
 	                                                     	buf(currpos + 4)._1), j))
 	}
-	var second: ListBuffer[(Double,Double)]  = ListBuffer()
+	var second: ListBuffer[(Double,Double,Double,Double,Double,Double, Double)]  = ListBuffer()
 	for(y1<-labels;y2<-labels;y3<-labels;y4<-labels;y5<-labels) {
     var tmp = Array[String](y1,y2,y3,y4,y5)
     var feat = for(j <- 1 until k) yield {
@@ -156,6 +257,31 @@ def log_likelihood_gradient(theta: DenseVector[Double]):DenseVector[Double] =  {
 		                                       buf(currpos + 3)._1,
 		                                       buf(currpos + 4)._1), j),
 		f2(tmp(j),tmp(j-1),Array[String](buf(currpos)._1,
+		                                       buf(currpos + 1)._1,
+		                                       buf(currpos + 2)._1,
+		                                       buf(currpos + 3)._1,
+		                                       buf(currpos + 4)._1), j),
+		f3(tmp(j),tmp(j-1),Array[String](buf(currpos)._1,
+		                                       buf(currpos + 1)._1,
+		                                       buf(currpos + 2)._1,
+		                                       buf(currpos + 3)._1,
+		                                       buf(currpos + 4)._1), j),
+		f4(tmp(j),tmp(j-1),Array[String](buf(currpos)._1,
+		                                       buf(currpos + 1)._1,
+		                                       buf(currpos + 2)._1,
+		                                       buf(currpos + 3)._1,
+		                                       buf(currpos + 4)._1), j),
+		f5(tmp(j),tmp(j-1),Array[String](buf(currpos)._1,
+		                                       buf(currpos + 1)._1,
+		                                       buf(currpos + 2)._1,
+		                                       buf(currpos + 3)._1,
+		                                       buf(currpos + 4)._1), j),
+		f6(tmp(j),tmp(j-1),Array[String](buf(currpos)._1,
+		                                       buf(currpos + 1)._1,
+		                                       buf(currpos + 2)._1,
+		                                       buf(currpos + 3)._1,
+		                                       buf(currpos + 4)._1), j),
+		f7(tmp(j),tmp(j-1),Array[String](buf(currpos)._1,
 		                                       buf(currpos + 1)._1,
 		                                       buf(currpos + 2)._1,
 		                                       buf(currpos + 3)._1,
@@ -170,12 +296,42 @@ def log_likelihood_gradient(theta: DenseVector[Double]):DenseVector[Double] =  {
 	                                       buf(currpos + 1)._1,
 	                                       buf(currpos + 2)._1,
 	                                       buf(currpos + 3)._1,
+	                                       buf(currpos + 4)._1),theta)),
+   				feat.map(_._3).sum*(probability(tmp, Array[String](buf(currpos)._1,
+	                                       buf(currpos + 1)._1,
+	                                       buf(currpos + 2)._1,
+	                                       buf(currpos + 3)._1,
+	                                       buf(currpos + 4)._1),theta)),
+   				feat.map(_._4).sum*(probability(tmp, Array[String](buf(currpos)._1,
+	                                       buf(currpos + 1)._1,
+	                                       buf(currpos + 2)._1,
+	                                       buf(currpos + 3)._1,
+	                                       buf(currpos + 4)._1),theta)),
+   				feat.map(_._5).sum*(probability(tmp, Array[String](buf(currpos)._1,
+	                                       buf(currpos + 1)._1,
+	                                       buf(currpos + 2)._1,
+	                                       buf(currpos + 3)._1,
+	                                       buf(currpos + 4)._1),theta)),
+   				feat.map(_._6).sum*(probability(tmp, Array[String](buf(currpos)._1,
+	                                       buf(currpos + 1)._1,
+	                                       buf(currpos + 2)._1,
+	                                       buf(currpos + 3)._1,
+	                                       buf(currpos + 4)._1),theta)),
+   				feat.map(_._7).sum*(probability(tmp, Array[String](buf(currpos)._1,
+	                                       buf(currpos + 1)._1,
+	                                       buf(currpos + 2)._1,
+	                                       buf(currpos + 3)._1,
 	                                       buf(currpos + 4)._1),theta))))
 	}	                           		   
     currpos += 1 
+    var toreturn = DenseVector[Double](first.map(_._1).sum - second.map(_._1).sum, first.map(_._2).sum - second.map(_._2).sum,
+									   first.map(_._3).sum - second.map(_._3).sum, first.map(_._4).sum - second.map(_._4).sum,																			
+									   first.map(_._5).sum - second.map(_._5).sum, first.map(_._6).sum - second.map(_._6).sum,
+									   first.map(_._7).sum - second.map(_._7).sum)																					  
     println("currpos" + currpos)
-    println("new theta " + DenseVector[Double](first.map(_._1).sum - second.map(_._1).sum, first.map(_._2).sum - second.map(_._2).sum))
-    return DenseVector[Double](first.map(_._1).sum - second.map(_._1).sum, first.map(_._2).sum - second.map(_._2).sum)
+    println("new theta " + toreturn)
+    second.clear()
+    return toreturn
 }
 
 
@@ -186,8 +342,8 @@ def log_likelihood_gradient(theta: DenseVector[Double]):DenseVector[Double] =  {
                  (neglog_likelihood(x),log_likelihood_gradient(x));
              }
     }
-    val lbfgs = new LBFGS[DenseVector[Double]](maxIter=(-1), m=3)
-    var weights = lbfgs.minimize(objectivef,DenseVector(0,0))
+    val lbfgs = new LBFGS[DenseVector[Double]](maxIter=(-1), m=7)
+    var weights = lbfgs.minimize(objectivef,DenseVector(1,1,1,1,1,1,1))
     println(weights)
 }
 }

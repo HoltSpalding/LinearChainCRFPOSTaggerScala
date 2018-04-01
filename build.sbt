@@ -25,6 +25,8 @@ version := "1.0"
 // You can define other libraries as dependencies in your build like this:
 libraryDependencies ++= Seq(
 "org.typelevel" %% "cats-core" % "1.0.1",
+"org.slf4j" % "slf4j-api" % "1.7.5",
+ "org.slf4j" % "slf4j-simple" % "1.7.5",
 "org.scalanlp" %% "breeze" % "0.13.1",
 "org.scalanlp" %% "breeze-natives" % "0.13.1",
 "ch.qos.logback" % "logback-classic" % "1.2.3" % Test

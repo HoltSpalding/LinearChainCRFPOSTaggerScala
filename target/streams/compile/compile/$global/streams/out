@@ -1,4 +1,2 @@
-[0m[[0m[31merror[0m] [0m[0m/home/holt/comp150/assignment6/src/main/scala/LinearCRF.scala:188:48: not found: value maxIter[0m
-[0m[[0m[31merror[0m] [0m[0m    val lbfgs = new LBFGS[DenseVector[Double]](maxIter=-1, m=3)[0m
-[0m[[0m[31merror[0m] [0m[0m                                               ^[0m
-[0m[[0m[31merror[0m] [0m[0mone error found[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere was one deprecation warning (since 0.13); re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mone warning found[0m

@@ -12,6 +12,16 @@ object Main extends App {
 }
 
 /*
+val objectivef = new DiffFunction[DenseVector[Double]] {
+             def calculate(x: DenseVector[Double]) = {
+                 //TODO negate log log_likelihood to minimize
+                  (norm((x - 3d) :^ 2d,1d),(x * 2d) - 6d);
+             }
+    }
+    val lbfgs = new LBFGS[DenseVector[Double]](tolerance = 0.00000000000000000000000000001,maxIter=(100000), m=7)
+    var weights = lbfgs.minimize(objectivef,DenseVector(1,1,1))
+    println(weights)
+    
 import scala.io.Source
 import java.io._
 import java.lang.String

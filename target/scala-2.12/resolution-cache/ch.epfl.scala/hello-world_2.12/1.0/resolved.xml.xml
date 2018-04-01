@@ -4,7 +4,7 @@
 		module="hello-world_2.12"
 		revision="1.0"
 		status="integration"
-		publication="20180326054411"
+		publication="20180401134239"
 	>
 		<description>
 		hello-world
@@ -33,6 +33,8 @@
 		<dependency org="org.scala-lang" name="scala-compiler" rev="2.12.4" conf="scala-tool->default,optional(default)"/>
 		<dependency org="org.scala-lang" name="scala-library" rev="2.12.4" conf="scala-tool->default,optional(default);compile->default(compile)"/>
 		<dependency org="org.typelevel" name="cats-core_2.12" rev="1.0.1" conf="compile->default(compile)"/>
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.5" conf="compile->default(compile)"/>
+		<dependency org="org.slf4j" name="slf4j-simple" rev="1.7.5" conf="compile->default(compile)"/>
 		<dependency org="org.scalanlp" name="breeze_2.12" rev="0.13.1" conf="compile->default(compile)"/>
 		<dependency org="org.scalanlp" name="breeze-natives_2.12" rev="0.13.1" conf="compile->default(compile)"/>
 		<dependency org="ch.qos.logback" name="logback-classic" rev="1.2.3" conf="test->default(compile)"/>
